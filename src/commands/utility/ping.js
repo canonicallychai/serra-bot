@@ -14,16 +14,17 @@ module.exports = {
         const latency = sent.createdTimestamp - interaction.createdTimestamp;
         const apiPing = Math.round(client.ws.ping);
 
-        await interaction.editReply(
-            `\
-            \`\`\`
-            ╔══════════════════════════════╗
-            ║      S.E.R.R.A STATUS        ║
-            ╠══════════════════════════════╣
-            ║ Gateway : ${latency} ms
-            ║ API     : ${apiPing} ms
-            ╚══════════════════════════════╝
-            \`\`\``
-        );
+        const output = [
+    "```ansi",
+    "\u001b[2;36mS.E.R.R.A // DIAGNOSTICS",
+    "",
+    `RTT    :: \u001b[2;35m${latency}ms\u001b[2;36m`,
+    `API    :: \u001b[2;35m${apiPing}ms\u001b[2;36m`,
+    "",
+    "STATUS :: \u001b[2;35mREADY\u001b[0m",
+    "```"
+].join("\n");
+
+await interaction.editReply(output);
     }
 };

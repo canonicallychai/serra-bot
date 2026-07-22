@@ -2,7 +2,9 @@ require('dotenv').config();
 
 const {
     Client,
-    GatewayIntentBits
+    Collection,
+    GatewayIntentBits,
+    Partials
 } = require('discord.js');
 
 const { loadCommands } = require('./handlers/commandHandler');
@@ -11,7 +13,13 @@ const { loadEvents } = require('./handlers/eventHandler');
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.MessageContent
+    ],
+
+    partials: [
+        Partials.Channel
     ]
 });
 
