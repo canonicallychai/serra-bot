@@ -1,3 +1,7 @@
+const { installCrashHandlers } = require('./utils/crashLogger');
+
+installCrashHandlers();
+
 require('dotenv').config();
 
 const {
@@ -14,6 +18,7 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.MessageContent
     ],
