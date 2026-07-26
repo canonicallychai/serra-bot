@@ -1,5 +1,10 @@
+const {
+    attachConsoleLoggerClient,
+    installConsoleChannelLogger
+} = require('./utils/consoleChannelLogger');
 const { installCrashHandlers } = require('./utils/crashLogger');
 
+installConsoleChannelLogger('1531032187330363403');
 installCrashHandlers();
 
 require('dotenv').config();
@@ -27,6 +32,8 @@ const client = new Client({
         Partials.Channel
     ]
 });
+
+attachConsoleLoggerClient(client);
 
 loadCommands(client);
 loadEvents(client);

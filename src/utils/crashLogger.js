@@ -3,6 +3,7 @@ const { getVoiceConnections } = require('@discordjs/voice');
 const {
     preserveVoiceChannelOnDisconnect
 } = require('./voiceDisconnectPolicy');
+const { flushConsoleLogs } = require('./consoleChannelLogger');
 
 let isShuttingDown = false;
 
@@ -39,8 +40,13 @@ function shutDown(exitCode) {
     disconnectVoiceConnections();
     process.exitCode = exitCode;
 
-    // Give the gateway a moment to transmit the voice-state update.
-    setTimeout(() => process.exit(exitCode), 250);
+    // Give Discord a moment to receive voice-state and console-log updates.
+    const exitTimer = setTimeout(() => process.exit(exitCode), 2_000);
+
+    flushConsoleLogs().finally(() => {
+        clearTimeout(exitTimer);
+        setTimeout(() => process.exit(exitCode), 250);
+    });
 }
 
 function formatError(error, seen = new Set()) {
