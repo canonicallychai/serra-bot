@@ -12,6 +12,8 @@ const {
     readVoiceChannels
 } = require('../../utils/voiceStateStore');
 
+const JOIN_SOUNDBOARD_SOUND_ID = '1325100051403505685';
+
 let hasAttemptedReconnect = false;
 
 module.exports = async function rejoinVoice(_readyClient, client) {
@@ -35,10 +37,15 @@ module.exports = async function rejoinVoice(_readyClient, client) {
             }
 
             const permissions = channel.permissionsFor(guild.members.me);
+            const requiredPermissions = [
+                PermissionFlagsBits.Connect,
+                PermissionFlagsBits.Speak,
+                PermissionFlagsBits.UseSoundboard
+            ];
 
-            if (!permissions?.has(PermissionFlagsBits.Connect)) {
+            if (!permissions?.has(requiredPermissions)) {
                 console.warn(
-                    `[VOICE] Cannot rejoin ${channel.name} (${channel.id}): missing Connect permission.`
+                    `[VOICE] Cannot rejoin ${channel.name} (${channel.id}): missing Connect, Speak, or Use Soundboard permission.`
                 );
                 continue;
             }
@@ -47,7 +54,7 @@ module.exports = async function rejoinVoice(_readyClient, client) {
                 channelId: channel.id,
                 guildId: guild.id,
                 adapterCreator: guild.voiceAdapterCreator,
-                selfDeaf: true
+                selfDeaf: false
             });
 
             await entersState(
@@ -59,6 +66,26 @@ module.exports = async function rejoinVoice(_readyClient, client) {
             console.log(
                 `[VOICE] Rejoined ${channel.name} (${channel.id}).`
             );
+
+            try {
+                await channel.sendSoundboardSound({
+                    soundId: JOIN_SOUNDBOARD_SOUND_ID
+                });
+                console.log(
+                    `[SOUNDBOARD] Played the join sound in ${channel.name} (${channel.id}).`
+                );
+            } catch (soundboardError) {
+                console.error(
+                    `[SOUNDBOARD] Failed to play ${JOIN_SOUNDBOARD_SOUND_ID} in ${channel.name} (${channel.id}):`,
+                    soundboardError
+                );
+            } finally {
+                if (!connection.rejoin({ selfDeaf: true })) {
+                    console.error(
+                        `[VOICE] Failed to self-deafen in ${channel.name} (${channel.id}).`
+                    );
+                }
+            }
         } catch (error) {
             console.error(
                 `[VOICE] Failed to rejoin saved channel ${channelId}:`,

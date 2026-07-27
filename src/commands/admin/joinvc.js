@@ -11,6 +11,8 @@ const {
 } = require('@discordjs/voice');
 const { saveVoiceChannel } = require('../../utils/voiceStateStore');
 
+const JOIN_SOUNDBOARD_SOUND_ID = '1325100051403505685';
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('joinvc')
@@ -56,9 +58,15 @@ module.exports = {
         const botMember = interaction.guild.members.me;
         const permissions = channel.permissionsFor(botMember);
 
-        if (!permissions?.has(PermissionFlagsBits.Connect)) {
+        const requiredPermissions = [
+            PermissionFlagsBits.Connect,
+            PermissionFlagsBits.Speak,
+            PermissionFlagsBits.UseSoundboard
+        ];
+
+        if (!permissions?.has(requiredPermissions)) {
             await interaction.editReply(
-                `I do not have permission to connect to ${channel}.`
+                `I need the Connect, Speak, and Use Soundboard permissions in ${channel}.`
             );
             return;
         }
@@ -67,7 +75,7 @@ module.exports = {
             channelId: channel.id,
             guildId: interaction.guild.id,
             adapterCreator: interaction.guild.voiceAdapterCreator,
-            selfDeaf: true
+            selfDeaf: false
         });
 
         try {
@@ -78,7 +86,30 @@ module.exports = {
             );
 
             saveVoiceChannel(interaction.guild.id, channel.id);
-            await interaction.editReply(`Joined ${channel}.`);
+
+            try {
+                await channel.sendSoundboardSound({
+                    soundId: JOIN_SOUNDBOARD_SOUND_ID
+                });
+                await interaction.editReply(
+                    `Joined ${channel} and played the join sound.`
+                );
+            } catch (soundboardError) {
+                console.error(
+                    `[SOUNDBOARD] Failed to play ${JOIN_SOUNDBOARD_SOUND_ID} in ${channel.name} (${channel.id}):`,
+                    soundboardError
+                );
+
+                await interaction.editReply(
+                    `Joined ${channel}, but I could not play the join sound. Make sure that sound belongs to this server and is available.`
+                );
+            } finally {
+                if (!connection.rejoin({ selfDeaf: true })) {
+                    console.error(
+                        `[VOICE] Failed to self-deafen in ${channel.name} (${channel.id}).`
+                    );
+                }
+            }
         } catch (error) {
             connection.destroy();
 
