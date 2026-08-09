@@ -26,9 +26,23 @@ module.exports = async function rejoinVoice(_readyClient, client) {
     for (const [guildId, channelId] of Object.entries(readVoiceChannels())) {
         try {
             const guild = await client.guilds.fetch(guildId);
-            const channel = await guild.channels.fetch(channelId);
+            const channel = await guild.channels.fetch(channelId).catch(error => {
+                if (error.code === 10003) {
+                    return null;
+                }
 
-            if (!channel || channel.type !== ChannelType.GuildVoice) {
+                throw error;
+            });
+
+            if (!channel) {
+                console.log(
+                    `[VOICE] No rejoin channel found for guild ${guildId}; cleared the saved channel.`
+                );
+                clearVoiceChannel(guildId);
+                continue;
+            }
+
+            if (channel.type !== ChannelType.GuildVoice) {
                 console.warn(
                     `[VOICE] Saved channel ${channelId} is no longer a voice channel.`
                 );
