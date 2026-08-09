@@ -12,7 +12,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('say')
         .setDescription('Sends a S.E.R.R.A transmission.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addChannelOption(option =>
             option
                 .setName('channel')

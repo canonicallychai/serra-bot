@@ -7,7 +7,7 @@ const RESET = '\u001b[0m';
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('members')
-        .setDescription('Reports the number of active simulations.')
+        .setDescription('Reports the number of active subjects.')
         .setDMPermission(false),
 
     async execute(interaction) {
@@ -17,9 +17,9 @@ module.exports = {
             '```ansi',
             `${TEAL}THE TRENCH // SIMULATION STATUS`,
             '',
-            `ACTIVE SIMULATIONS :: ${MAGENTA}${memberCount}${TEAL}`,
+            `ACTIVE SUBJECTS :: ${MAGENTA}${memberCount}${TEAL}`,
             '',
-            `STATUS             :: ${MAGENTA}SIGNALS STABLE${RESET}`,
+            `STATUS          :: ${MAGENTA}SIGNALS STABLE${RESET}`,
             '```'
         ].join('\n');
 

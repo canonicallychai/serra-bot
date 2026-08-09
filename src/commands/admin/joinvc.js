@@ -16,43 +16,54 @@ const JOIN_SOUNDBOARD_SOUND_ID = '1325100051403505685';
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('joinvc')
-        .setDescription('Joins a voice channel by its ID.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.MoveMembers)
+        .setDescription('Joins a voice channel.')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false)
         .addStringOption(option =>
             option
                 .setName('vc_id')
-                .setDescription('The ID of the voice channel to join.')
+                .setDescription('The voice channel ID. Defaults to your current channel.')
                 .setMinLength(17)
                 .setMaxLength(20)
-                .setRequired(true)
+                .setRequired(false)
         ),
 
     async execute(interaction) {
-        const channelId = interaction.options
-            .getString('vc_id', true)
-            .trim();
+        const channelId = interaction.options.getString('vc_id')?.trim();
 
         await interaction.deferReply({
             flags: MessageFlags.Ephemeral
         });
 
-        if (!/^\d{17,20}$/.test(channelId)) {
-            await interaction.editReply(
-                'That is not a valid Discord channel ID.'
-            );
-            return;
-        }
+        let channel;
 
-        const channel = await interaction.guild.channels
-            .fetch(channelId)
-            .catch(() => null);
+        if (channelId) {
+            if (!/^\d{17,20}$/.test(channelId)) {
+                await interaction.editReply(
+                    'That is not a valid Discord channel ID.'
+                );
+                return;
+            }
 
-        if (!channel || channel.type !== ChannelType.GuildVoice) {
-            await interaction.editReply(
-                'That ID does not belong to a voice channel in this server.'
-            );
-            return;
+            channel = await interaction.guild.channels
+                .fetch(channelId)
+                .catch(() => null);
+
+            if (!channel || channel.type !== ChannelType.GuildVoice) {
+                await interaction.editReply(
+                    'That ID does not belong to a voice channel in this server.'
+                );
+                return;
+            }
+        } else {
+            channel = interaction.member?.voice?.channel;
+
+            if (!channel || channel.type !== ChannelType.GuildVoice) {
+                await interaction.editReply(
+                    'AUTORESPONSE // No active voice signal detected. Join a voice channel and try again.'
+                );
+                return;
+            }
         }
 
         const botMember = interaction.guild.members.me;
@@ -66,7 +77,14 @@ module.exports = {
 
         if (!permissions?.has(requiredPermissions)) {
             await interaction.editReply(
-                `I need the Connect, Speak, and Use Soundboard permissions in ${channel}.`
+                `AUTORESPONSE // Unable to enter ${channel}. Connect, Speak, and Use Soundboard access are required.`
+            );
+            return;
+        }
+
+        if (!channel.joinable) {
+            await interaction.editReply(
+                `AUTORESPONSE // Unable to enter ${channel}. The voice channel is not currently accessible.`
             );
             return;
         }
@@ -119,7 +137,7 @@ module.exports = {
             );
 
             await interaction.editReply(
-                `I could not connect to ${channel}. Check my permissions and try again.`
+                `AUTORESPONSE // Connection to ${channel} failed. Check channel access and try again.`
             );
         }
     }

@@ -11,7 +11,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('verbatim')
         .setDescription('Copies your next message to another channel.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false)
         .addStringOption(option =>
             option

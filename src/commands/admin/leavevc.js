@@ -10,7 +10,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('leavevc')
         .setDescription('Leaves the active voice channel in this server.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.MoveMembers)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
 
     async execute(interaction) {
