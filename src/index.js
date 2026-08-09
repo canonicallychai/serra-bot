@@ -30,7 +30,11 @@ const client = new Client({
 
     partials: [
         Partials.Channel
-    ]
+    ],
+
+    presence: {
+        status: 'idle'
+    }
 });
 
 attachConsoleLoggerClient(client);
