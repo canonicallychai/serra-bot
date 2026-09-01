@@ -58,6 +58,10 @@ YOU HAVE ALREADY ACCEPTED THE TERMS.${RESET}
         try {
             await member.roles.add(VERIFIED_ROLE_ID);
 
+            console.log(
+                `[VERIFY] Completed user=${message.author.id} guild=${message.guild.id}.`
+            );
+
             const success = await message.channel.send({
                 content: `\`\`\`ansi
 ${TEAL}ACCESS CONFIRMED

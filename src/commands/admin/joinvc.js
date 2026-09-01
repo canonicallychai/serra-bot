@@ -10,6 +10,7 @@ const {
     VoiceConnectionStatus
 } = require('@discordjs/voice');
 const { saveVoiceChannel } = require('../../utils/voiceStateStore');
+const { setSelfDeaf } = require('../../utils/voiceDeafState');
 
 const JOIN_SOUNDBOARD_SOUND_ID = '1325100051403505685';
 
@@ -122,11 +123,13 @@ module.exports = {
                     `Joined ${channel}, but I could not play the join sound. Make sure that sound belongs to this server and is available.`
                 );
             } finally {
-                if (!connection.rejoin({ selfDeaf: true })) {
-                    console.error(
-                        `[VOICE] Failed to self-deafen in ${channel.name} (${channel.id}).`
-                    );
-                }
+                await setSelfDeaf(connection, interaction.guild, true)
+                    .catch(error => {
+                        console.error(
+                            `[VOICE] Failed to self-deafen in ${channel.name} (${channel.id}):`,
+                            error
+                        );
+                    });
             }
         } catch (error) {
             connection.destroy();

@@ -23,7 +23,6 @@ async function updateLobbyUptime(client) {
             status: 'channel_unavailable',
             updatedAt
         });
-        console.log('[LOBBY UPTIME] Hourly snapshot: lobby channel unavailable.');
         return;
     }
 
@@ -40,7 +39,6 @@ async function updateLobbyUptime(client) {
                 active: false,
                 updatedAt
             });
-            console.log('[LOBBY UPTIME] Hourly snapshot: no active session.');
             return;
         }
 
@@ -60,7 +58,6 @@ async function updateLobbyUptime(client) {
             updatedAt: Math.floor(Date.now() / 1_000)
         });
 
-        console.log('[LOBBY UPTIME] Hourly snapshot saved.');
     } catch (error) {
         saveLobbyUptime({
             channelId: LOBBY_VOICE_CHANNEL_ID,

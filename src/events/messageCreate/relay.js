@@ -137,10 +137,6 @@ DESTINATION SET TO DEFAULT CHANNEL${RESET}
             id: channelId
         };
 
-        console.log(
-            `[RELAY] Output changed to channel ${targetChannel.name} (${channelId}).`
-        );
-
         return;
     }
 
@@ -181,10 +177,6 @@ DESTINATION SET TO DEFAULT CHANNEL${RESET}
             type: 'dm',
             id: userId
         };
-
-        console.log(
-            `[RELAY] Output changed to DM with ${targetUser.username} (${userId}).`
-        );
 
         return;
     }

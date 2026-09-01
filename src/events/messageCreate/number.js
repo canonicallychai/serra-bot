@@ -49,6 +49,10 @@ module.exports = async function number(message) {
 
                 if (existingColorRoles.length > 0) {
                     await member.roles.remove(existingColorRoles);
+
+                    console.log(
+                        `[COLOR ROLE] Removed user=${message.author.id} guild=${message.guild.id}.`
+                    );
                 }
 
                 const confirmation = await message.channel.send({
@@ -85,12 +89,21 @@ ${TEAL}COLOR ROLE REMOVED${RESET}
                 await member.roles.remove(previousColorRoles);
             }
 
+            let roleChanged = previousColorRoles.length > 0;
+
             /*
              * Assign after removing the previous selection so the final role
              * operation always leaves the requested color on the member.
              */
             if (!member.roles.cache.has(selectedRole.id)) {
                 await member.roles.add(selectedRole);
+                roleChanged = true;
+            }
+
+            if (roleChanged) {
+                console.log(
+                    `[COLOR ROLE] Changed user=${message.author.id} guild=${message.guild.id} role=${selectedRole.id}.`
+                );
             }
 
             const confirmation = await message.channel.send({

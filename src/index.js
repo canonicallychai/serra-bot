@@ -43,4 +43,17 @@ attachConsoleLoggerClient(client);
 loadCommands(client);
 loadEvents(client);
 
-client.login(process.env.DISCORD_TOKEN);
+client.once('clientReady', readyClient => {
+    console.log(
+        `[CLIENT] Ready user=${readyClient.user.id} guilds=${readyClient.guilds.cache.size}.`
+    );
+});
+
+client.on('error', error => {
+    console.error('[CLIENT] Discord client error:', error);
+});
+
+client.login(process.env.DISCORD_TOKEN)
+    .catch(error => {
+        console.error('[CLIENT] Discord login failed:', error);
+    });

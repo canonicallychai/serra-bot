@@ -12,13 +12,14 @@ const {
     NoSubscriberBehavior
 } = require('@discordjs/voice');
 const SamJs = require('sam-js');
+const { setSelfDeaf } = require('../../utils/voiceDeafState');
 
 const MAX_PLAYBACK_MS = 120_000;
 const PLAYBACK_VOLUME = 0.8;
 const activeGuilds = new Set();
 
 const sam = new SamJs({
-    speed: 90,
+    speed: 96,
     pitch: 64,
     throat: 128,
     mouth: 128
@@ -137,9 +138,7 @@ module.exports = {
                 throw new Error('SAM could not synthesize the supplied text.');
             }
 
-            if (!connection.rejoin({ selfDeaf: false })) {
-                throw new Error('The voice connection could not self-undeafen.');
-            }
+            await setSelfDeaf(connection, interaction.guild, false);
 
             await playAudio(connection, lowerWavVolume(wav));
             await interaction.editReply('SAM transmission complete.');
@@ -160,9 +159,13 @@ module.exports = {
         } finally {
             activeGuilds.delete(guildId);
 
-            if (!connection.rejoin({ selfDeaf: true })) {
-                console.error(`[SAM] Failed to self-deafen in guild ${guildId}.`);
-            }
+            await setSelfDeaf(connection, interaction.guild, true)
+                .catch(error => {
+                    console.error(
+                        `[SAM] Failed to self-deafen in guild ${guildId}:`,
+                        error
+                    );
+                });
         }
     }
 };

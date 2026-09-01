@@ -6,6 +6,16 @@ const {
 const { flushConsoleLogs } = require('./consoleChannelLogger');
 
 let isShuttingDown = false;
+let hasLoggedOffline = false;
+
+function logOffline(exitCode) {
+    if (hasLoggedOffline) {
+        return;
+    }
+
+    hasLoggedOffline = true;
+    console.log(`[CLIENT] Offline exitCode=${exitCode}.`);
+}
 
 function disconnectVoiceConnections() {
     const connections = [...getVoiceConnections().values()];
@@ -24,11 +34,6 @@ function disconnectVoiceConnections() {
         }
     }
 
-    if (connections.length > 0) {
-        console.log(
-            `[SHUTDOWN] Disconnected ${connections.length} voice connection(s).`
-        );
-    }
 }
 
 function shutDown(exitCode) {
@@ -37,6 +42,7 @@ function shutDown(exitCode) {
     }
 
     isShuttingDown = true;
+    logOffline(exitCode);
     disconnectVoiceConnections();
     process.exitCode = exitCode;
 
@@ -119,17 +125,18 @@ function installCrashHandlers() {
     });
 
     process.on('SIGINT', () => {
-        console.log('\n[SHUTDOWN] Received SIGINT.');
         shutDown(130);
     });
 
     process.on('SIGTERM', () => {
-        console.log('\n[SHUTDOWN] Received SIGTERM.');
         shutDown(143);
     });
 
     // This is also called for direct process.exit() calls.
-    process.on('exit', disconnectVoiceConnections);
+    process.on('exit', exitCode => {
+        logOffline(exitCode);
+        disconnectVoiceConnections();
+    });
 }
 
 module.exports = {

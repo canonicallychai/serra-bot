@@ -15,11 +15,24 @@ module.exports = async function commands(interaction, client) {
         return;
     }
 
+    const startedAt = Date.now();
+    const context =
+        `command=/${interaction.commandName} ` +
+        `user=${interaction.user.id} ` +
+        `guild=${interaction.guildId ?? 'DM'} ` +
+        `channel=${interaction.channelId ?? 'unknown'}`;
+
+    console.log(`[COMMAND] Started ${context}.`);
+
     try {
         await command.execute(interaction, client);
+
+        console.log(
+            `[COMMAND] Completed ${context} durationMs=${Date.now() - startedAt}.`
+        );
     } catch (error) {
         console.error(
-            `[INTERACTION] Failed to execute /${interaction.commandName}:`,
+            `[COMMAND] Failed ${context} durationMs=${Date.now() - startedAt}:`,
             error
         );
 

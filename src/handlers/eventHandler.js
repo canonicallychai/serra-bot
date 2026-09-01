@@ -8,8 +8,6 @@ function loadEvents(client) {
         withFileTypes: true
     });
 
-    let loadedHandlers = 0;
-
     for (const folder of eventFolders) {
         if (!folder.isDirectory()) continue;
 
@@ -30,7 +28,7 @@ function loadEvents(client) {
             const handler = require(filePath);
 
             if (typeof handler !== 'function') {
-                console.warn(
+                console.error(
                     `[EVENT HANDLER] Skipped ${eventName}/${file.name}: expected a function export.`
                 );
                 continue;
@@ -46,17 +44,8 @@ function loadEvents(client) {
                     });
             });
 
-            loadedHandlers++;
-
-            console.log(
-                `[EVENT HANDLER] Loaded ${eventName}/${file.name}`
-            );
         }
     }
-
-    console.log(
-        `[EVENT HANDLER] ${loadedHandlers} handler(s) loaded.`
-    );
 }
 
 module.exports = {

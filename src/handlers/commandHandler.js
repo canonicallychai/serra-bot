@@ -32,7 +32,7 @@ function loadCommands(client) {
         const command = require(filePath);
 
         if (!command.data || typeof command.execute !== 'function') {
-            console.warn(
+            console.error(
                 `[COMMAND HANDLER] Skipped ${filePath}: missing "data" or "execute".`
             );
             continue;
@@ -41,7 +41,7 @@ function loadCommands(client) {
         const commandName = command.data.name;
 
         if (client.commands.has(commandName)) {
-            console.warn(
+            console.error(
                 `[COMMAND HANDLER] Duplicate command "${commandName}" skipped.`
             );
             continue;
@@ -49,12 +49,7 @@ function loadCommands(client) {
 
         client.commands.set(commandName, command);
 
-        console.log(`[COMMAND HANDLER] Loaded /${commandName}`);
     }
-
-    console.log(
-        `[COMMAND HANDLER] ${client.commands.size} command(s) loaded.`
-    );
 }
 
 module.exports = { loadCommands };
