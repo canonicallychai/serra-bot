@@ -69,6 +69,13 @@ module.exports = async function rejoinVoice(_readyClient, client) {
                 selfDeaf: false
             });
 
+            connection.on('error', error => {
+                console.error(
+                    `[VOICE] Connection error in ${channel.name} (${channel.id}):`,
+                    error
+                );
+            });
+
             await entersState(
                 connection,
                 VoiceConnectionStatus.Ready,

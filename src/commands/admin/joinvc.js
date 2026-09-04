@@ -97,6 +97,13 @@ module.exports = {
             selfDeaf: false
         });
 
+        connection.on('error', error => {
+            console.error(
+                `[VOICE] Connection error in ${channel.name} (${channel.id}):`,
+                error
+            );
+        });
+
         try {
             await entersState(
                 connection,
